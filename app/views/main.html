@@ -26,6 +26,12 @@
 <div>
   <h1>Angular google maps test</h1>
 
-  <ui-gmap-google-map center='map.center' zoom='map.zoom'></ui-gmap-google-map>
+  <ui-gmap-google-map center="map.center" zoom="map.zoom">
+
+    <ui-gmap-markers models="markersList" coords="'self'"></ui-gmap-markers>
+    
+  </ui-gmap-google-map>
+
+
 </div>
  
