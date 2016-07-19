@@ -1,0 +1,38 @@
+[
+    {
+        "id": 605,
+        "longitude": -122.678708,
+        "latitude": 45.514795,
+        "theft_prob_per_bike_day_x_1000": "0.26570381"
+    },
+    {
+        "id": 888,
+        "longitude": -122.678971,
+        "latitude": 45.514293,
+        "theft_prob_per_bike_day_x_1000": "0.47432590"
+    },
+    {
+        "id": 921,
+        "longitude": -122.678527,
+        "latitude": 45.51512,
+        "theft_prob_per_bike_day_x_1000": "0.68703283"
+    },
+    {
+        "id": 4644,
+        "longitude": -122.67878,
+        "latitude": 45.515072,
+        "theft_prob_per_bike_day_x_1000": "0.37417232"
+    },
+    {
+        "id": 4645,
+        "longitude": -122.678792,
+        "latitude": 45.515077,
+        "theft_prob_per_bike_day_x_1000": "0.37592063"
+    },
+    {
+        "id": 4646,
+        "longitude": -122.678808,
+        "latitude": 45.515081,
+        "theft_prob_per_bike_day_x_1000": "0.37730519"
+    }
+]
