@@ -20,12 +20,25 @@
 
 // have map return first 10 racs in above case with map fit to marker and racks 
 
+// add search bar for users to search for a location on map 
+
 angular.module('angularTheftAppApp')
     .constant('baseURL','http://localhost:8000/api/v1/racks/')
+
+    // .controller('FibonacciService', ['$scope', function($scope){
+    //   $scope.test = 'fuck'
+
+    // }]);
     .controller('MapCtrl', ['$scope', '$http', 'baseURL', function($scope, $http, baseURL) {
 
         $scope.map = { center: { latitude: 45.521570, longitude: -122.673371 }, zoom: 10 };
         $scope.markerBreakdown = [];
+
+// ----------------------------------------------------------------------------------------------
+// initialze scope lat and long to values of marker so that you can search from start without dragging
+// need to change this to use user lat/long if possible 
+        $scope.lat = 45.521570;
+        $scope.lon = -122.673371;        
 
 // ----------------------------------------------------------------------------------------------
         $scope.marker = {
@@ -63,6 +76,8 @@ angular.module('angularTheftAppApp')
             }
           }
         };
+
+
 
 
 // ----------------------------------------------------------------------------------------------

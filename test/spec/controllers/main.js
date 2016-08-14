@@ -1,23 +1,22 @@
 'use strict';
 
-describe('Controller: MainCtrl', function () {
-
-  // load the controller's module
+describe('MapCtrl', function() {
   beforeEach(module('angularTheftAppApp'));
 
-  var MainCtrl,
-    scope;
+  var $controller;
 
-  // Initialize the controller and a mock scope
-  beforeEach(inject(function ($controller, $rootScope) {
-    scope = $rootScope.$new();
-    MainCtrl = $controller('MainCtrl', {
-      $scope: scope
-      // place here mocked dependencies
-    });
+  beforeEach(inject(function(_$controller_){
+    // The injector unwraps the underscores (_) from around the parameter names when matching
+    $controller = _$controller_;
   }));
 
-  it('should attach a list of awesomeThings to the scope', function () {
-    expect(MainCtrl.awesomeThings.length).toBe(3);
+    describe('$scope.grade', function() {
+      it('sets the strength to "strong" if the password length is >8 chars', function() {
+        var $scope = {};
+        var controller = $controller('MapCtrl', { $scope: $scope });
+        $scope.map = 'strong';
+        // $scope.grade();
+        expect($scope.map).toEqual('strong');
+      });
   });
 });
