@@ -26,19 +26,19 @@
 <div>
   <h1>Angular google maps test</h1>
 
-  <ui-gmap-google-map center="map.center" zoom="map.zoom">
+  <ui-gmap-google-map center="map.center" zoom="map.zoom" control="mapControl">
 
     <ui-gmap-marker coords="marker.coords" options="marker.options" 
-      events="marker.events" idkey="marker.id"></ui-gmap-marker>
+      events="marker.events" idkey="marker.id" control="mapControl"></ui-gmap-marker>
 
     
     <ui-gmap-markers models="markerBreakdown"
-     coords="'self'" idkey="id" fit="true"></ui-gmap-markers>
+     coords="'self'" idkey="id" fit="true" control="mapControl"></ui-gmap-markers>
     
   
   </ui-gmap-google-map>
 
-  <button ng-click="rackSearch()">Test button</button>
+  <button ng-click="rackSearch()">Search button</button>
 
 
 </div>
