@@ -14,7 +14,7 @@ describe('controller: MapCtrl', function() {
 
   describe('MapCtrl default values test', function(){
     it('sets map objects to default values', function() {
-      expect(this.scope.map).toEqual({ center: { latitude: 45.521570, longitude: -122.673371 }, zoom: 10 });
+      expect(this.scope.map).toEqual({ center: { latitude: 45.521570, longitude: -122.673371 }, zoom: 15 });
       expect(this.baseURL).toEqual('http://localhost:8000/api/v1/racks/');
     });
 

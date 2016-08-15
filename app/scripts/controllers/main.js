@@ -25,7 +25,7 @@
 angular.module('angularTheftAppApp')
     .constant('baseURL','http://localhost:8000/api/v1/racks/')
 
-    .controller('MapCtrl', ['$scope', '$http', 'baseURL', 'rackFinder', function($scope, $http, baseURL, rackFinder) {
+    .controller('MapCtrl', ['$scope', '$http', 'baseURL', function($scope, $http, baseURL) {
 
         $scope.map = { center: { latitude: 45.521570, longitude: -122.673371 }, zoom: 15 };
         $scope.markerBreakdown = [];
@@ -104,20 +104,41 @@ angular.module('angularTheftAppApp')
                 $http.get(baseURL+'?dist=100&point='+$scope.lon+','+$scope.lat)
                 .then(function(response) {
                     $scope.markers = response.data.results; 
-                    // break up json object to format gmap can use with markers 
+
+                    // sort theft scores from racks 
+                    // assign colors to each theft score based on which precentile they fall into 
+                    $scope.markers.sort(function(a, b) {
+                        return parseFloat(a.theft_prob_per_bike_day_x_1000) - parseFloat(b.theft_prob_per_bike_day_x_1000);
+                    });
+
+                    var colorArray = ['A', 'B', 'C'];
 
 
 
+                    // break up json object to format gmap can use with markers
                     for (var i = 0; i < $scope.markers.length; i++) { 
+
+                        var colorIdx = 0;
+                        var colorSplit = $scope.markers.length / 3; 
+
+                        if (i < colorSplit) {
+                          colorIdx = 0;
+                        } else if (i > colorSplit && i < colorSplit * 2) {
+                          colorIdx = 1;
+                        } else {
+                          colorIdx = 2; 
+                        }
+
+                        console.log(colorIdx);
+
                         var obj = {
                             id: $scope.markers[i].id, 
                             longitude: $scope.markers[i].geom.coordinates[0],
                             latitude: $scope.markers[i].geom.coordinates[1],
                             theftProb: $scope.markers[i].theft_prob_per_bike_day_x_1000,
-                            markerOptions: {icon: ''}
+                            markerOptions: {label: colorArray[colorIdx]}
 
                         };
-
                         $scope.markerBreakdown.push(obj);
                     }
                     console.log($scope.markerBreakdown);
