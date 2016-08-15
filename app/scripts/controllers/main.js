@@ -27,7 +27,7 @@ angular.module('angularTheftAppApp')
 
     .controller('MapCtrl', ['$scope', '$http', 'baseURL', 'rackFinder', function($scope, $http, baseURL, rackFinder) {
 
-        $scope.map = { center: { latitude: 45.521570, longitude: -122.673371 }, zoom: 10 };
+        $scope.map = { center: { latitude: 45.521570, longitude: -122.673371 }, zoom: 15 };
         $scope.markerBreakdown = [];
 
 // ----------------------------------------------------------------------------------------------
@@ -101,16 +101,21 @@ angular.module('angularTheftAppApp')
 // need to add pull down menu to give user ability to change search distance 
 
         $scope.rackSearch = function() {
-                $http.get(baseURL+'?dist=1000&point='+$scope.lon+','+$scope.lat)
+                $http.get(baseURL+'?dist=100&point='+$scope.lon+','+$scope.lat)
                 .then(function(response) {
                     $scope.markers = response.data.results; 
                     // break up json object to format gmap can use with markers 
+
+
+
                     for (var i = 0; i < $scope.markers.length; i++) { 
                         var obj = {
                             id: $scope.markers[i].id, 
                             longitude: $scope.markers[i].geom.coordinates[0],
                             latitude: $scope.markers[i].geom.coordinates[1],
-                            theftProb: $scope.markers[i].theft_prob_per_bike_day_x_1000
+                            theftProb: $scope.markers[i].theft_prob_per_bike_day_x_1000,
+                            markerOptions: {icon: ''}
+
                         };
 
                         $scope.markerBreakdown.push(obj);
@@ -118,16 +123,14 @@ angular.module('angularTheftAppApp')
                     console.log($scope.markerBreakdown);
                 });
 
-                var map = $scope.mapControl.getGMap();
-                var markers = $scope.mapControl.getGMarkers();
-                var bounds = map.getBounds();
-                console.log(bounds);
-                for (var i = 0; i < markers.length; i++) {
-                    bounds.extend(markers[i].getPosition());
-                }
-                map.setCenter(bounds.getCenter());
-                map.fitBounds(bounds);
-                map.setZoom(map.getZoom() - 1);
+                // add invisible marker to the list of racks where search location is so zoom fit includes search location 
+                var markersetup = {
+                  id: 0,
+                  latitude: $scope.marker.coords.latitude,
+                  longitude: $scope.marker.coords.longitude,
+                  markerOptions: {visible: false}
+                  };
+                $scope.markerBreakdown.push(markersetup);
             };
 
 // ----------------------------------------------------------------------------------------------
