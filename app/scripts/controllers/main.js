@@ -52,7 +52,7 @@ angular.module('angularTheftAppApp')
           },
           options: { 
             draggable: true, 
-            icon: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png'
+            icon: '../../bower_components/map-icons/src/icons/bicycle-store.svg'
           },
           events: {
             dragend: function (marker) {
@@ -74,7 +74,8 @@ angular.module('angularTheftAppApp')
                 labelContent: 'lat: ' + $scope.marker.coords.latitude + ' ' + 'lon: ' + $scope.marker.coords.longitude,
                 labelAnchor: '100 0',
                 labelClass: 'marker-labels',
-                icon: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png'
+                icon: '../../bower_components/map-icons/src/icons/bicycle-store.svg',
+
               };
             }
           }
@@ -101,24 +102,28 @@ angular.module('angularTheftAppApp')
 // need to add pull down menu to give user ability to change search distance 
 
         $scope.rackSearch = function() {
-                $http.get(baseURL+'?dist=100&point='+$scope.lon+','+$scope.lat)
+                $http.get(baseURL+'?dist=1000&point='+$scope.lon+','+$scope.lat)
                 .then(function(response) {
                     $scope.markers = response.data.results; 
 
-                    // sort theft scores from racks 
-                    // assign colors to each theft score based on which precentile they fall into 
+                    // sort theft scores from racks from lowest to highest  
                     $scope.markers.sort(function(a, b) {
                         return parseFloat(a.theft_prob_per_bike_day_x_1000) - parseFloat(b.theft_prob_per_bike_day_x_1000);
                     });
 
-                    var colorArray = ['A', 'B', 'C'];
+                    // replace array with references to different colored icons 
+                    // var colorArray = ['A', 'B', 'C'];
 
+                    var colorArray = [
+                      'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+                      'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
+                      'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+                    ];
 
-
-                    // break up json object to format gmap can use with markers
+                    
                     for (var i = 0; i < $scope.markers.length; i++) { 
 
-                        var colorIdx = 0;
+                        var colorIdx;
                         var colorSplit = $scope.markers.length / 3; 
 
                         if (i < colorSplit) {
@@ -128,15 +133,15 @@ angular.module('angularTheftAppApp')
                         } else {
                           colorIdx = 2; 
                         }
-
                         console.log(colorIdx);
 
+                        // break up json object to format gmap can use with markers
                         var obj = {
                             id: $scope.markers[i].id, 
                             longitude: $scope.markers[i].geom.coordinates[0],
                             latitude: $scope.markers[i].geom.coordinates[1],
                             theftProb: $scope.markers[i].theft_prob_per_bike_day_x_1000,
-                            markerOptions: {label: colorArray[colorIdx]}
+                            markerOptions: {icon: colorArray[colorIdx]}
 
                         };
                         $scope.markerBreakdown.push(obj);

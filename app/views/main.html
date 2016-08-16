@@ -25,21 +25,27 @@
 
 <div>
   <h1>Angular google maps test</h1>
+  <div class="row">
+    <ui-gmap-google-map center="map.center" zoom="map.zoom">
 
-  <ui-gmap-google-map center="map.center" zoom="map.zoom">
+      <ui-gmap-marker coords="marker.coords" options="marker.options" 
+        events="marker.events" idkey="marker.id"></ui-gmap-marker>
 
-    <ui-gmap-marker coords="marker.coords" options="marker.options" 
-      events="marker.events" idkey="marker.id"></ui-gmap-marker>
-
+      
+      <ui-gmap-markers models="markerBreakdown"
+       coords="'self'" idkey="id" fit="true" options="'markerOptions'"></ui-gmap-markers>
+      
     
-    <ui-gmap-markers models="markerBreakdown"
-     coords="'self'" idkey="id" fit="true" options="'markerOptions'"></ui-gmap-markers>
-    
-  
-  </ui-gmap-google-map>
+    </ui-gmap-google-map>
+  </div>
+  <div class="row">
+    <div class="col-xs-8">
+      <button type="button" class="btn btn-danger btn-lg btn-block" ng-click="rackSearch()">Search button</button>
+    </div>
+    <div class="col-xs-4">
 
-  <button ng-click="rackSearch()">Search button</button>
-
+    </div>
+  </div>
 
 </div>
  
