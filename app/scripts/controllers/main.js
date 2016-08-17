@@ -29,13 +29,7 @@ angular.module('angularTheftAppApp')
 
         $scope.map = { center: { latitude: 45.521570, longitude: -122.673371 }, zoom: 15 };
         $scope.markerBreakdown = [];
-
-// ----------------------------------------------------------------------------------------------
-        // $scope.$watch($scope.map.mapControl, function(){ 
-        //   var gmap = $scope.map.mapControl.getGMap();
-        // });
-        $scope.mapControl = {};
-
+        $scope.distance = 50;
 
 // ----------------------------------------------------------------------------------------------
 // initialze scope lat and long to values of marker so that you can search from start without dragging
@@ -59,15 +53,9 @@ angular.module('angularTheftAppApp')
               console.log('marker dragend');
               $scope.lat = marker.getPosition().lat();
               $scope.lon = marker.getPosition().lng();
-              console.log($scope.lat);
-              console.log($scope.lon);
 
-// *******************************************************************
-// clear out bicycle rack array when marker is moved 
-
+              // clear out bicycle rack array when marker is moved 
               $scope.markerBreakdown = [];
-
-// *******************************************************************
 
               $scope.marker.options = {
                 draggable: true,
@@ -81,72 +69,79 @@ angular.module('angularTheftAppApp')
           }
         };
 
-// ----------------------------------------------------------------------------------------------
-// need to figure out asyncronus stuff with this factory call and how to return object to controller 
-
-      // var racksTest = rackFinder.getBicycleParking(100, $scope.lon, $scope.lat);
-      // console.log('racktest start');
-      // console.log(racksTest); 
-      // console.log('racktest end');
-
-      // $scope.testCtrl = function($scope, rackFinder){
-      //   $scope.markerBreakdown = function() {
-      //     rackFinder.getBicycleParking(100, $scope.lon, $scope.lat);
-      //   };
-      // }
-
-
 
 // ----------------------------------------------------------------------------------------------
 // search within 100 m of dragable markers location 
 // need to add pull down menu to give user ability to change search distance 
 
+
+// ----------------------------------------------------------------------------------------------
+        var httpHelp = function(url, racksObj, callback){
+          // adds racks obj to array and then checks to see if there is more paginated data
+          // if so recursively call the api until all data returned 
+          $http.get(url).then(function(response){ 
+            Array.prototype.push.apply(racksObj, response.data.results);
+          
+            if (response.data.next !== null) {
+              httpHelp(response.data.next, racksObj, callback);
+            } else {
+              callback();
+            }
+          });
+        };
+          
+// ----------------------------------------------------------------------------------------------
         $scope.rackSearch = function() {
-                $http.get(baseURL+'?dist=1000&point='+$scope.lon+','+$scope.lat)
-                .then(function(response) {
-                    $scope.markers = response.data.results; 
+                var url = baseURL+'?dist='+$scope.distance+'&point='+$scope.lon+','+$scope.lat;
+                console.log(url);
 
-                    // sort theft scores from racks from lowest to highest  
-                    $scope.markers.sort(function(a, b) {
-                        return parseFloat(a.theft_prob_per_bike_day_x_1000) - parseFloat(b.theft_prob_per_bike_day_x_1000);
-                    });
+                // clear out existing markers 
+                $scope.markerBreakdown = [];
 
-                    // replace array with references to different colored icons 
-                    // var colorArray = ['A', 'B', 'C'];
+                // create new object to hold markers in httpHelp
+                $scope.markers = [];
 
-                    var colorArray = [
-                      'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
-                      'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
-                      'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
-                    ];
+                httpHelp(url, $scope.markers, function(){
+                  // callback function that sorts racks based on theft score and assigns colors to markers accordingly 
+                  console.log('inside rackSearch');
+                  console.log($scope.markers);
 
-                    
-                    for (var i = 0; i < $scope.markers.length; i++) { 
+                  // sort theft scores from racks from lowest to highest  
+                  $scope.markers.sort(function(a, b) {
+                      return parseFloat(a.theft_prob_per_bike_day_x_1000) - parseFloat(b.theft_prob_per_bike_day_x_1000);
+                  });
 
-                        var colorIdx;
-                        var colorSplit = $scope.markers.length / 3; 
+                  var colorArray = [
+                    'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+                    'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
+                    'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+                  ];
+                  
+                  for (var i = 0; i < $scope.markers.length; i++) { 
 
-                        if (i < colorSplit) {
-                          colorIdx = 0;
-                        } else if (i > colorSplit && i < colorSplit * 2) {
-                          colorIdx = 1;
-                        } else {
-                          colorIdx = 2; 
-                        }
-                        console.log(colorIdx);
+                      var colorIdx;
+                      var colorSplit = $scope.markers.length / 3; 
 
-                        // break up json object to format gmap can use with markers
-                        var obj = {
-                            id: $scope.markers[i].id, 
-                            longitude: $scope.markers[i].geom.coordinates[0],
-                            latitude: $scope.markers[i].geom.coordinates[1],
-                            theftProb: $scope.markers[i].theft_prob_per_bike_day_x_1000,
-                            markerOptions: {icon: colorArray[colorIdx]}
+                      if (i < colorSplit) {
+                        colorIdx = 0;
+                      } else if (i > colorSplit && i < colorSplit * 2) {
+                        colorIdx = 1;
+                      } else {
+                        colorIdx = 2; 
+                      }
 
-                        };
-                        $scope.markerBreakdown.push(obj);
-                    }
-                    console.log($scope.markerBreakdown);
+                      // break up json object to format gmap can use with markers
+                      var obj = {
+                          id: $scope.markers[i].id, 
+                          longitude: $scope.markers[i].geom.coordinates[0],
+                          latitude: $scope.markers[i].geom.coordinates[1],
+                          theftProb: $scope.markers[i].theft_prob_per_bike_day_x_1000,
+                          markerOptions: {icon: colorArray[colorIdx]}
+
+                      };
+                      $scope.markerBreakdown.push(obj);
+                  }
+
                 });
 
                 // add invisible marker to the list of racks where search location is so zoom fit includes search location 
@@ -160,16 +155,11 @@ angular.module('angularTheftAppApp')
             };
 
 // ----------------------------------------------------------------------------------------------
-        // work on moving url call to a factory service 
-        // $scope.markers = rackFinder;
+// function to control search distance and 2 way data binding 
+        $scope.distFunc = function(distSelect) {
 
+          $scope.distance = distSelect;
+        };
 // ----------------------------------------------------------------------------------------------
-    //create empty LatLngBounds object
-
-
-
-// ----------------------------------------------------------------------------------------------
-
-
     }]);
 

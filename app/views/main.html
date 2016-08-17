@@ -43,7 +43,16 @@
       <button type="button" class="btn btn-danger btn-lg btn-block" ng-click="rackSearch()">Search button</button>
     </div>
     <div class="col-xs-4">
-
+      <div class="dropup">
+        <button class="btn btn-default btn-lg btn-block dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">Search Distance: {{distance}}
+        <span class="caret"></span></button>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+          <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="distFunc(50)">50</a></li>
+          <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="distFunc(100)">100</a></li>
+          <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="distFunc(150)">150</a></li>
+          <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="distFunc(200)">200</a></li>
+        </ul>
+      </div>
     </div>
   </div>
 
