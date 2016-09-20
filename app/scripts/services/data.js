@@ -1,90 +1,54 @@
 'use strict';
 
 angular.module('angularTheftAppApp')
-.factory('rackFinder', ['$http', 'baseURL', function($http, baseURL){
+.factory('rackFactory', [ function(){
+    var rackFactory = {};
 
-//     // ----------------------------------------------------------------------------------------------
-//     var httpHelp = function(url, racksObj, callback){
-//       // adds racks obj to array and then checks to see if there is more paginated data
-//       // if so recursively call the api until all data returned 
-//       $http.get(url).then(function(response){ 
-//         Array.prototype.push.apply(racksObj, response.data.results);
-      
-//         if (response.data.next !== null) {
-//           httpHelp(response.data.next, racksObj, callback);
-//         } else {
-//           callback();
-//         }
-//       });
-//     };
-      
-// // ----------------------------------------------------------------------------------------------
-//     return { 
-//         rackSearch: function(baseURL, distance, lon, lat) {
-//             // var url = baseURL+'?dist='distance+'&point='lon+','+lat;
-//             console.log(baseUrl);
+    rackFactory.colorRacks = function (racks, $scope) {
+    // takes a list of sorted racks and assigns red, yellow, green markers to them based on theft score  
+        var sortedRacks = [];
 
-//             // clear out existing markers 
-//             var markerBreakdown = [];
+        var colorArray = [
+            'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+            'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
+            'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+          ];
 
-//             // create new object to hold markers in httpHelp
-//             var markers = [];
+        for (var i = 0; i < racks.length; i++) { 
+            var colorIdx;
+            var colorSplit = racks.length / 3; 
 
-//             httpHelp(baseUrl, markers, function(){
-//               // callback function that sorts racks based on theft score and assigns colors to markers accordingly 
-//               console.log('inside rackSearch');
-//               console.log(markers);
+            if (i < colorSplit) {
+            colorIdx = 0;
+            } else if (i > colorSplit && i < colorSplit * 2) {
+            colorIdx = 1;
+            } else {
+            colorIdx = 2; 
+            }
 
-//               // sort theft scores from racks from lowest to highest  
-//               markers.sort(function(a, b) {
-//                   return parseFloat(a.theft_prob_per_bike_day_x_1000) - parseFloat(b.theft_prob_per_bike_day_x_1000);
-//               });
+            // break up json object to format gmap can use with markers
+            var obj = {
+              id: racks[i].id, 
+              longitude: racks[i].geom.coordinates[0],
+              latitude: racks[i].geom.coordinates[1],
+              theftProb: racks[i].theft_prob_per_bike_day_x_1000,
+              markerOptions: {icon: colorArray[colorIdx]}
 
-//               var colorArray = [
-//                 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
-//                 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
-//                 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
-//               ];
-              
-//               for (var i = 0; i < markers.length; i++) { 
+            };
+            sortedRacks.push(obj);
+        }
+        // add invisible marker to the list of racks where search location is so zoom fit includes search location
+        var markersetup = {
+                  id: 0,
+                  latitude: $scope.marker.coords.latitude,
+                  longitude: $scope.marker.coords.longitude,
+                  markerOptions: {visible: false}
+                  };
+        sortedRacks.push(markersetup);
 
-//                   var colorIdx;
-//                   var colorSplit = markers.length / 3; 
+        return sortedRacks;
+    };
 
-//                   if (i < colorSplit) {
-//                     colorIdx = 0;
-//                   } else if (i > colorSplit && i < colorSplit * 2) {
-//                     colorIdx = 1;
-//                   } else {
-//                     colorIdx = 2; 
-//                   }
-
-//                   // break up json object to format gmap can use with markers
-//                   var obj = {
-//                       id: markers[i].id, 
-//                       longitude: markers[i].geom.coordinates[0],
-//                       latitude: markers[i].geom.coordinates[1],
-//                       theftProb: markers[i].theft_prob_per_bike_day_x_1000,
-//                       markerOptions: {icon: colorArray[colorIdx]}
-
-//                   };
-//                   markerBreakdown.push(obj);
-//               }
-
-//             });
-//         console.log(markerBreakdown);
-
-            // add invisible marker to the list of racks where search location is so zoom fit includes search location 
-        //     var markersetup = {
-        //       id: 0,
-        //       latitude: $scope.marker.coords.latitude,
-        //       longitude: $scope.marker.coords.longitude,
-        //       markerOptions: {visible: false}
-        //       };
-        //     markerBreakdown.push(markersetup);
-        // };
-        // }
-    // };
-
+    return rackFactory;
 }]);
 

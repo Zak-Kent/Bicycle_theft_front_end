@@ -18,10 +18,10 @@
 angular.module('angularTheftAppApp')
     .constant('baseURL','http://localhost:8000/api/v1/racks/')
 
-    .controller('MapCtrl', ['$scope', '$http', 'baseURL', function($scope, $http, baseURL) {
+    .controller('MapCtrl', ['$scope', '$http', 'baseURL', 'rackFactory', function($scope, $http, baseURL, rackFactory) {
 
         $scope.map = { center: { latitude: 45.521570, longitude: -122.673371 }, zoom: 15 };
-        $scope.markerBreakdown = [];
+        $scope.rackMarkers = [];
         $scope.distance = 50;
 
 // ----------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ angular.module('angularTheftAppApp')
               $scope.lon = marker.getPosition().lng();
 
               // clear out bicycle rack array when marker is moved 
-              $scope.markerBreakdown = [];
+              $scope.rackMarkers = [];
 
               $scope.marker.options = {
                 draggable: true,
@@ -83,9 +83,9 @@ angular.module('angularTheftAppApp')
                 console.log(url);
 
                 // clear out existing markers 
-                $scope.markerBreakdown = [];
+                $scope.rackMarkers = [];
 
-                // create new object to hold markers in httpHelp
+                // create new object to hold markers in httpHelp function 
                 $scope.markers = [];
 
                 httpHelp(url, $scope.markers, function(){
@@ -98,64 +98,15 @@ angular.module('angularTheftAppApp')
                       return parseFloat(a.theft_prob_per_bike_day_x_1000) - parseFloat(b.theft_prob_per_bike_day_x_1000);
                   });
 
-                  var colorArray = [
-                    'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
-                    'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
-                    'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
-                  ];
-                  
-                  for (var i = 0; i < $scope.markers.length; i++) { 
-
-                      var colorIdx;
-                      var colorSplit = $scope.markers.length / 3; 
-
-                      if (i < colorSplit) {
-                        colorIdx = 0;
-                      } else if (i > colorSplit && i < colorSplit * 2) {
-                        colorIdx = 1;
-                      } else {
-                        colorIdx = 2; 
-                      }
-
-                      // break up json object to format gmap can use with markers
-                      var obj = {
-                          id: $scope.markers[i].id, 
-                          longitude: $scope.markers[i].geom.coordinates[0],
-                          latitude: $scope.markers[i].geom.coordinates[1],
-                          theftProb: $scope.markers[i].theft_prob_per_bike_day_x_1000,
-                          markerOptions: {icon: colorArray[colorIdx]}
-
-                      };
-                      $scope.markerBreakdown.push(obj);
-                  }
+                  $scope.rackMarkers = rackFactory.colorRacks($scope.markers, $scope);
 
                 });
 
-                // add invisible marker to the list of racks where search location is so zoom fit includes search location 
-                var markersetup = {
-                  id: 0,
-                  latitude: $scope.marker.coords.latitude,
-                  longitude: $scope.marker.coords.longitude,
-                  markerOptions: {visible: false}
-                  };
-                $scope.markerBreakdown.push(markersetup);
             };
 
-// ----------------------------------------------------------------------------------------------
-        // $scope.rackSearch = function($scope.distance, $scope.lon, $scope.lat, baseUrl) {
-        //   $scope.markerBreakdown = [];
-
-        //   rackFinder.rackSearch(baseURL, $scope.distance, $scope.lon, $scope.lat).success(function(racks){
-        //     $scope.markerBreakdown = racks; 
-        //     console.log($scope.markerBreakdown);
-        //   });
-
-        // }
-// ----------------------------------------------------------------------------------------------
 // function to control search distance and 2 way data binding 
         $scope.distFunc = function(distSelect) {
           $scope.distance = distSelect;
         };
 // ----------------------------------------------------------------------------------------------
     }]);
-
