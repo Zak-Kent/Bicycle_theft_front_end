@@ -9,18 +9,11 @@
  */
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! issues below !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
-// still have issue with pagination and returning more than 25 rack per get request 
-
 // need to make option of placing marker - have a dragable starting marker now 
-// need to make marker start at use location 
-
-// create button to redo search with new marker location - have button  
+// need to make marker start at use location  
 
 // add logic to respond with message saying no racks found within range
-
 // have map return first 10 racs in above case with map fit to marker and racks 
-
-// add search bar for users to search for a location on map 
 
 angular.module('angularTheftAppApp')
     .constant('baseURL','http://localhost:8000/api/v1/racks/')
@@ -59,7 +52,7 @@ angular.module('angularTheftAppApp')
 
               $scope.marker.options = {
                 draggable: true,
-                labelContent: 'lat: ' + $scope.marker.coords.latitude + ' ' + 'lon: ' + $scope.marker.coords.longitude,
+                // labelContent: 'lat: ' + $scope.marker.coords.latitude + ' ' + 'lon: ' + $scope.marker.coords.longitude,
                 labelAnchor: '100 0',
                 labelClass: 'marker-labels',
                 icon: '../../bower_components/map-icons/src/icons/bicycle-store.svg',
@@ -68,12 +61,6 @@ angular.module('angularTheftAppApp')
             }
           }
         };
-
-
-// ----------------------------------------------------------------------------------------------
-// search within 100 m of dragable markers location 
-// need to add pull down menu to give user ability to change search distance 
-
 
 // ----------------------------------------------------------------------------------------------
         var httpHelp = function(url, racksObj, callback){
@@ -155,9 +142,18 @@ angular.module('angularTheftAppApp')
             };
 
 // ----------------------------------------------------------------------------------------------
+        // $scope.rackSearch = function($scope.distance, $scope.lon, $scope.lat, baseUrl) {
+        //   $scope.markerBreakdown = [];
+
+        //   rackFinder.rackSearch(baseURL, $scope.distance, $scope.lon, $scope.lat).success(function(racks){
+        //     $scope.markerBreakdown = racks; 
+        //     console.log($scope.markerBreakdown);
+        //   });
+
+        // }
+// ----------------------------------------------------------------------------------------------
 // function to control search distance and 2 way data binding 
         $scope.distFunc = function(distSelect) {
-
           $scope.distance = distSelect;
         };
 // ----------------------------------------------------------------------------------------------
