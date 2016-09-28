@@ -10,7 +10,7 @@
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! issues below !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
 // need to make option of placing marker - have a dragable starting marker now 
-// need to make marker start at use location  
+// need to make marker start at user location  
 
 // add logic to respond with message saying no racks found within range
 // have map return first 10 racs in above case with map fit to marker and racks 
@@ -18,17 +18,36 @@
 angular.module('angularTheftAppApp')
     .constant('baseURL','http://localhost:8000/api/v1/racks/')
 
-    .controller('MapCtrl', ['$scope', '$http', 'baseURL', 'rackFactory', function($scope, $http, baseURL, rackFactory) {
+    .controller('MapCtrl', ['$scope', '$http','$window', 'baseURL', 'rackFactory', function($scope, $http, $window, baseURL, rackFactory) {
 
-        $scope.map = { center: { latitude: 45.521570, longitude: -122.673371 }, zoom: 15 };
+        $scope.lat = 45.521570;
+        $scope.lon = -122.673371;
+
+        $scope.map = {center: {latitude: 45.521, longitude: -122.673}, zoom: 10};
+
         $scope.rackMarkers = [];
         $scope.distance = 50;
 
 // ----------------------------------------------------------------------------------------------
 // initialze scope lat and long to values of marker so that you can search from start without dragging
 // need to change this to use user lat/long if possible 
-        $scope.lat = 45.521570;
-        $scope.lon = -122.673371;        
+
+        // first pass at grabbing user location 
+        $window.navigator.geolocation.getCurrentPosition(function(position){
+          console.log(position);
+          var lati = position.coords.latitude;
+          var longi = position.coords.longitude;
+
+          $scope.$apply(function(){
+            $scope.lat = lati;
+            $scope.lon = longi; 
+            $scope.map = {center: {latitude: $scope.lat, longitude: $scope.lon}, zoom: 15};
+            $scope.marker.coords = {latitude: $scope.lat, longitude: $scope.lon};
+          });
+
+        });
+
+        
 
 // ----------------------------------------------------------------------------------------------
         $scope.marker = {
@@ -98,6 +117,7 @@ angular.module('angularTheftAppApp')
                       return parseFloat(a.theft_prob_per_bike_day_x_1000) - parseFloat(b.theft_prob_per_bike_day_x_1000);
                   });
 
+                  // call rackFactor colorRacks method to assign markers to racks based on theft score 
                   $scope.rackMarkers = rackFactory.colorRacks($scope.markers, $scope);
 
                 });
