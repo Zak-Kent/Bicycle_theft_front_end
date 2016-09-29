@@ -6,6 +6,10 @@ angular.module('angularTheftAppApp')
 
     rackFactory.colorRacks = function (racks, $scope) {
     // takes a list of sorted racks and assigns red, yellow, green markers to them based on theft score  
+        racks.sort(function(a, b) {
+          return parseFloat(a.theft_prob_per_bike_day_x_1000) - parseFloat(b.theft_prob_per_bike_day_x_1000);
+          });
+
         var sortedRacks = [];
 
         var colorArray = [

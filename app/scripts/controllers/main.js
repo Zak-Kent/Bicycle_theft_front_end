@@ -9,8 +9,6 @@
  */
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! issues below !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
-// need to make option of placing marker - have a dragable starting marker now 
-// need to make marker start at user location  
 
 // add logic to respond with message saying no racks found within range
 // have map return first 10 racs in above case with map fit to marker and racks 
@@ -18,7 +16,8 @@
 angular.module('angularTheftAppApp')
     .constant('baseURL','http://localhost:8000/api/v1/racks/')
 
-    .controller('MapCtrl', ['$scope', '$http','$window', 'baseURL', 'rackFactory', function($scope, $http, $window, baseURL, rackFactory) {
+    .controller('MapCtrl', ['$scope', '$http','$window', 'baseURL', 'rackFactory', 'markerFactory', 
+      function($scope, $http, $window, baseURL, rackFactory, markerFactory) {
 
         $scope.lat = 45.521570;
         $scope.lon = -122.673371;
@@ -29,7 +28,7 @@ angular.module('angularTheftAppApp')
         $scope.distance = 50;
 
 // ----------------------------------------------------------------------------------------------
-// initialze scope lat and long to values of marker so that you can search from start without dragging
+// initialze scope lat and long to values
 // need to change this to use user lat/long if possible 
 
         // first pass at grabbing user location 
@@ -38,6 +37,7 @@ angular.module('angularTheftAppApp')
           var lati = position.coords.latitude;
           var longi = position.coords.longitude;
 
+          // watches the variables inside func and updates app if they change 
           $scope.$apply(function(){
             $scope.lat = lati;
             $scope.lon = longi; 
@@ -46,40 +46,10 @@ angular.module('angularTheftAppApp')
           });
 
         });
-
-        
-
+   
 // ----------------------------------------------------------------------------------------------
-        $scope.marker = {
-          id: 0,
-          coords: {
-            latitude: $scope.lat,
-            longitude: $scope.lon
-          },
-          options: { 
-            draggable: true, 
-            icon: '../../bower_components/map-icons/src/icons/bicycle-store.svg'
-          },
-          events: {
-            dragend: function (marker) {
-              console.log('marker dragend');
-              $scope.lat = marker.getPosition().lat();
-              $scope.lon = marker.getPosition().lng();
-
-              // clear out bicycle rack array when marker is moved 
-              $scope.rackMarkers = [];
-
-              $scope.marker.options = {
-                draggable: true,
-                // labelContent: 'lat: ' + $scope.marker.coords.latitude + ' ' + 'lon: ' + $scope.marker.coords.longitude,
-                labelAnchor: '100 0',
-                labelClass: 'marker-labels',
-                icon: '../../bower_components/map-icons/src/icons/bicycle-store.svg',
-
-              };
-            }
-          }
-        };
+        // using markerService to create search marker 
+        $scope.marker = markerFactory.createMarker($scope);
 
 // ----------------------------------------------------------------------------------------------
         var httpHelp = function(url, racksObj, callback){
@@ -99,7 +69,6 @@ angular.module('angularTheftAppApp')
 // ----------------------------------------------------------------------------------------------
         $scope.rackSearch = function() {
                 var url = baseURL+'?dist='+$scope.distance+'&point='+$scope.lon+','+$scope.lat;
-                console.log(url);
 
                 // clear out existing markers 
                 $scope.rackMarkers = [];
@@ -108,20 +77,9 @@ angular.module('angularTheftAppApp')
                 $scope.markers = [];
 
                 httpHelp(url, $scope.markers, function(){
-                  // callback function that sorts racks based on theft score and assigns colors to markers accordingly 
-                  console.log('inside rackSearch');
-                  console.log($scope.markers);
-
-                  // sort theft scores from racks from lowest to highest  
-                  $scope.markers.sort(function(a, b) {
-                      return parseFloat(a.theft_prob_per_bike_day_x_1000) - parseFloat(b.theft_prob_per_bike_day_x_1000);
-                  });
-
-                  // call rackFactor colorRacks method to assign markers to racks based on theft score 
+                  // callback rackFactor colorRacks method to assign markers to racks based on theft score 
                   $scope.rackMarkers = rackFactory.colorRacks($scope.markers, $scope);
-
                 });
-
             };
 
 // function to control search distance and 2 way data binding 
