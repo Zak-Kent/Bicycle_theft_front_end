@@ -16,8 +16,8 @@
 angular.module('angularTheftAppApp')
     .constant('baseURL','http://localhost:8000/api/v1/racks/')
 
-    .controller('MapCtrl', ['$scope', '$http','$window', 'baseURL', 'rackFactory', 'markerFactory', 
-      function($scope, $http, $window, baseURL, rackFactory, markerFactory) {
+    .controller('MapCtrl', ['$scope', '$http','$window', 'baseURL', 'rackFactory', 'markerFactory', 'locationFactory', 
+      function($scope, $http, $window, baseURL, rackFactory, markerFactory, locationFactory) {
 
         $scope.lat = 45.521570;
         $scope.lon = -122.673371;
@@ -37,13 +37,19 @@ angular.module('angularTheftAppApp')
           var lati = position.coords.latitude;
           var longi = position.coords.longitude;
 
-          // watches the variables inside func and updates app if they change 
-          $scope.$apply(function(){
-            $scope.lat = lati;
-            $scope.lon = longi; 
-            $scope.map = {center: {latitude: $scope.lat, longitude: $scope.lon}, zoom: 15};
-            $scope.marker.coords = {latitude: $scope.lat, longitude: $scope.lon};
-          });
+          // if user location inside usable area re-center map 
+          if (locationFactory.locCheck(lati, longi)) {
+            // watches the variables inside func and updates app if they change 
+            $scope.$apply(function(){
+              $scope.lat = lati;
+              $scope.lon = longi; 
+              $scope.map = {center: {latitude: $scope.lat, longitude: $scope.lon}, zoom: 15};
+              $scope.marker.coords = {latitude: $scope.lat, longitude: $scope.lon};
+            });
+
+          } else {
+            console.log("outside of usable area");
+          }
 
         });
    
@@ -77,7 +83,7 @@ angular.module('angularTheftAppApp')
                 $scope.markers = [];
 
                 httpHelp(url, $scope.markers, function(){
-                  // callback rackFactor colorRacks method to assign markers to racks based on theft score 
+                  // callback rackFactory colorRacks method to assign markers to racks based on theft score 
                   $scope.rackMarkers = rackFactory.colorRacks($scope.markers, $scope);
                 });
             };
