@@ -10,15 +10,15 @@ angular.module('angularTheftAppApp')
   var yMin = 45.431566;
   var yMax = 45.637628;
 
-  locationFactory.locCheck = function(lat, longi){
+  locationFactory.locCheck = function(lat, lon){
 
-    var longi = longi * -1; 
+    var posLon = lon * -1; 
     // check to see if point is inside user area 
-    if (xMax >= longi && longi >= xMin && yMax >= lat && lat >= yMin){
-      console.log("inisde the square");
+    if (xMax >= posLon && posLon >= xMin && yMax >= lat && lat >= yMin){
+      console.log('inisde the square');
       return true; 
     } else {
-      console.log("outside the square");
+      console.log('outside the square');
       return false; 
       
     }

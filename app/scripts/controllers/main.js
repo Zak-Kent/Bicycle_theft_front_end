@@ -48,14 +48,25 @@ angular.module('angularTheftAppApp')
             });
 
           } else {
-            console.log("outside of usable area");
+            console.log('outside of usable area');
           }
 
         });
    
 // ----------------------------------------------------------------------------------------------
         // using markerService to create search marker 
-        $scope.marker = markerFactory.createMarker($scope);
+
+        var dragEvent = function(lat, lon){
+          console.log('inside drag event');
+          console.log(lat, lon);
+          $scope.lat = lat;
+          $scope.lon = lon;
+
+          console.log($scope.lat, $scope.lon);
+        };
+
+        $scope.marker = markerFactory.createMarker($scope.lat, $scope.lon, dragEvent);
+
 
 // ----------------------------------------------------------------------------------------------
         var httpHelp = function(url, racksObj, callback){
