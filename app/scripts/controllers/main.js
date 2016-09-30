@@ -94,8 +94,8 @@ angular.module('angularTheftAppApp')
                 $scope.markers = [];
 
                 httpHelp(url, $scope.markers, function(){
-                  // callback rackFactory colorRacks method to assign markers to racks based on theft score 
-                  $scope.rackMarkers = rackFactory.colorRacks($scope.markers, $scope);
+                  // callback rackFactory sortRacks method to assign markers to racks based on theft score 
+                  $scope.rackMarkers = rackFactory.sortRacks($scope.markers, $scope.marker);
                 });
             };
 

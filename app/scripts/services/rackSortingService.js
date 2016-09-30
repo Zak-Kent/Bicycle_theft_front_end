@@ -4,7 +4,7 @@ angular.module('angularTheftAppApp')
 .factory('rackFactory', [ function(){
     var rackFactory = {};
 
-    rackFactory.colorRacks = function (racks, $scope) {
+    rackFactory.sortRacks = function (racks, marker) {
     // takes a list of sorted racks and assigns red, yellow, green markers to them based on theft score  
         racks.sort(function(a, b) {
           return parseFloat(a.theft_prob_per_bike_day_x_1000) - parseFloat(b.theft_prob_per_bike_day_x_1000);
@@ -44,8 +44,8 @@ angular.module('angularTheftAppApp')
         // add invisible marker to the list of racks where search location is so zoom fit includes search location
         var markersetup = {
                   id: 0,
-                  latitude: $scope.marker.coords.latitude,
-                  longitude: $scope.marker.coords.longitude,
+                  latitude: marker.coords.latitude,
+                  longitude: marker.coords.longitude,
                   markerOptions: {visible: false}
                   };
         sortedRacks.push(markersetup);
