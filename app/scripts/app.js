@@ -35,3 +35,12 @@ angular
       });
 
   });
+  // .config(function(uiGmapGoogleMapApiProvider) {
+  //   uiGmapGoogleMapApiProvider.configure({
+  //       key: 'AIzaSyAp0T-QkAiOsPQArJvVFnSEum42qvaEy_s',
+  //       v: '3.20', //defaults to latest 3.X anyhow
+  //       libraries: 'geometry'
+  //   });
+
+  // });
+

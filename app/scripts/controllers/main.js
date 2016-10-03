@@ -16,16 +16,51 @@
 angular.module('angularTheftAppApp')
     .constant('baseURL','http://localhost:8000/api/v1/racks/')
 
-    .controller('MapCtrl', ['$scope', '$http','$window', 'baseURL', 'rackFactory', 'markerFactory', 'locationFactory', 
-      function($scope, $http, $window, baseURL, rackFactory, markerFactory, locationFactory) {
+    .controller('MapCtrl', ['$scope', '$http','$window', 'baseURL', 
+      'rackFactory', 'markerFactory', 'locationFactory', 'uiGmapIsReady', 'uiGmapGoogleMapApi', 
+      function($scope, $http, $window, baseURL, rackFactory, markerFactory, locationFactory, uiGmapIsReady, uiGmapGoogleMapApi) {
 
-        $scope.lat = 45.521570;
-        $scope.lon = -122.673371;
+        // leaving these out has marker only appear on zoom user location 
+        // $scope.lat = 45.521570;
+        // $scope.lon = -122.673371;
 
-        $scope.map = {center: {latitude: 45.521, longitude: -122.673}, zoom: 10};
+          $scope.map = {
+            center: {
+              latitude: 45.521, 
+              longitude: -122.673
+            }, 
+            zoom: 10,
+            control: {},
+            events: {}
+
+          };
 
         $scope.rackMarkers = [];
         $scope.distance = 50;
+
+// ----------------------------------------------------------------------------------------------
+        uiGmapGoogleMapApi.then(function(maps) {
+          console.log('kajdhkajhdg;khjad;g');
+          $scope.map = {
+            center: {
+              latitude: 45.521, 
+              longitude: -122.673
+            }, 
+            zoom: 10,
+            control: {}, 
+            events: {
+              tilesloaded: function(maps) {
+                console.log(maps);
+              },
+              dragend: function(maps) {
+                console.log('askdjf;asdjsalkfj');
+              }
+            }
+          };  
+
+
+
+        });
 
 // ----------------------------------------------------------------------------------------------
 // initialze scope lat and long to values
@@ -43,7 +78,7 @@ angular.module('angularTheftAppApp')
             $scope.$apply(function(){
               $scope.lat = lati;
               $scope.lon = longi; 
-              $scope.map = {center: {latitude: $scope.lat, longitude: $scope.lon}, zoom: 15};
+              $scope.map = {control: {}, center: {latitude: $scope.lat, longitude: $scope.lon}, zoom: 15};
               $scope.marker.coords = {latitude: $scope.lat, longitude: $scope.lon};
             });
 
@@ -54,8 +89,36 @@ angular.module('angularTheftAppApp')
         });
    
 // ----------------------------------------------------------------------------------------------
+// calculate the radius of the map that is currently visable to search with this dist 
+      // $scope.map = {
+      //   center: {latitude: $scope.lat, longitude: $scope.lon}, 
+      //   zoom: 15,
+      //   events: {
+      //     tilesloaded: function (map) {
+      //       $scope.$apply(function (){
+      //         console.log("this is map instance");
+      //         var test = map.getBounds();
+      //         console.log(test);
+      //       });
+      //     }
+      //   }
+      // };
+      uiGmapIsReady.promise()
+      .then(function(instances) {
+        var testMap = instances[0].map; 
+        console.log("test map");
+        console.log(testMap);
+      // var test = $scope.map.control.getGMap()
+      // console.log(test);
+      });
+
+
+
+
+// ----------------------------------------------------------------------------------------------
         // using markerService to create search marker 
 
+        // helper function used to manipulate scope outside of markerFactory 
         var dragEvent = function(lat, lon){
           console.log('inside drag event');
           console.log(lat, lon);
