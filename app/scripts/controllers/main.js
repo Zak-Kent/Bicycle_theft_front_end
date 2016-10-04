@@ -19,7 +19,6 @@ angular.module('angularTheftAppApp')
 // You don't need functions monitoring the map for changes!!!
 // just grab the center and bounds and calculate the dist once the search button is pressed 
 
-
 // ----------------------------------------------------------------------------------------------
 
     .controller('MapCtrl', ['$scope', '$http','$window', 'baseURL', 'myLocation', 
@@ -111,28 +110,31 @@ angular.module('angularTheftAppApp')
               var bounds = mapObj.getBounds();
 
               // to get lat/long need to call center.lat()/.long()
-              var centerLat = mapObj.getCenter().lat();
+              $scope.centerLat = mapObj.getCenter().lat();
+              $scope.centerLon = mapObj.getCenter().lng();
               
               console.log(bounds.b.b);
               console.log(bounds.b.f);
-              console.log(centerLat);
+              
 
               // make new lat/lng obj for right/left edge of map for dist search 
-              var leftSide = new google.maps.LatLng(centerLat, bounds.b.b);
-              var rightSide = new google.maps.LatLng(centerLat, bounds.b.f);
+              var leftSide = new google.maps.LatLng($scope.centerLat, bounds.b.b);
+              var rightSide = new google.maps.LatLng($scope.centerLat, bounds.b.f);
+
+              $scope.mapDistance = google.maps.geometry.spherical.computeDistanceBetween(leftSide, rightSide);
 
               console.log('leftSide', leftSide.lng());
 
               console.log('distance between left & right of map')
-              console.log(google.maps.geometry.spherical.computeDistanceBetween(leftSide, rightSide));
-
+              console.log($scope.mapDistance);
+              console.log($scope.centerLat);
+              console.log($scope.centerLon);
 
           });
 
+          var url = baseURL+'?dist='+$scope.mapDistance+'&point='+$scope.centerLon+','+$scope.centerLat;
 
-
-
-          var url = baseURL+'?dist='+$scope.distance+'&point='+$scope.lon+','+$scope.lat;
+          console.log('url', url);
 
           // clear out existing markers 
           $scope.rackMarkers = [];
@@ -145,12 +147,12 @@ angular.module('angularTheftAppApp')
             $scope.rackMarkers = rackFactory.sortRacks($scope.markers, $scope.marker);
           });
 
-
         };
+// ----------------------------------------------------------------------------------------------
 
 // function to control search distance and 2 way data binding 
         $scope.distFunc = function(distSelect) {
           $scope.distance = distSelect;
         };
-// ----------------------------------------------------------------------------------------------
+
     }]);
