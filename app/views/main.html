@@ -26,7 +26,7 @@
 <div>
   <h1>PDX Bike Theft</h1>
   <div class="row">
-    <ui-gmap-google-map control="map.control" events="map.events" center="map.center" zoom="map.zoom">
+    <ui-gmap-google-map center="map.center" zoom="map.zoom" draggable="true" options="map.options" events="map.events" control="googlemap">
 
       <ui-gmap-marker coords="marker.coords" options="marker.options" 
         events="marker.events" idkey="marker.id"></ui-gmap-marker>
@@ -34,9 +34,9 @@
       
       <ui-gmap-markers models="rackMarkers"
        coords="'self'" idkey="id" fit="true" options="'markerOptions'"></ui-gmap-markers>
-      
-    
+
     </ui-gmap-google-map>
+
   </div>
   <div class="row">
     <div class="col-xs-8">

@@ -24,4 +24,54 @@ angular.module('angularTheftAppApp')
     }
   };
   return locationFactory;
+}])
+
+// service that uses $q to return a promise to get user location 
+.service('myLocation', ['$window', '$q', function($window, $q) {
+    this.getMapOptions = function(){
+      return {
+        mapOptions : {
+          minZoom : 3,
+          zoomControl : false,
+          draggable : true,
+          navigationControl : false,
+          mapTypeControl : false,
+          scaleControl : false,
+          streetViewControl : false,
+          //mapTypeId : google.maps.MapTypeId.HYBRID,
+          disableDoubleClickZoom : false,
+          keyboardShortcuts : true,
+          styles : [{
+              featureType : "poi",
+              elementType : "labels",
+              stylers : [{
+                  visibility : "off"
+              }]
+          }, 
+          {
+            featureType : "transit",
+            elementType : "all",
+            stylers : [{
+                visibility : "off"
+            }]
+          }],
+        }
+      };
+    };
+
+
+
+  this.getCurrentLoc = function() {
+    var deferred = $q.defer();
+    $window.navigator.geolocation.getCurrentPosition(function(position) {
+      console.log(position);
+      var myCurrentLoc = {
+        latitude: position.coords.latitude, 
+        longitude: position.coords.longitude 
+      };
+      deferred.resolve(myCurrentLoc);
+    });
+    return deferred.promise; 
+  };
+
 }]);

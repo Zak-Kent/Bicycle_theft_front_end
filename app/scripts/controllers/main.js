@@ -16,9 +16,64 @@
 angular.module('angularTheftAppApp')
     .constant('baseURL','http://localhost:8000/api/v1/racks/')
 
-    .controller('MapCtrl', ['$scope', '$http','$window', 'baseURL', 
+
+    // .controller('apCtrl', ['$scope','myLocation', 'uiGmapGoogleMapApi', function($scope, myLocation, uiGmapGoogleMapApi){
+      
+    //   $scope.myCurrentLocation = {};
+    
+    //   var initialMapLoad = 0;
+
+    //   myLocation.getCurrentLoc()
+    //     .then(function(myCurrentLoc){
+    //       console.log('myCurrentLoc', myCurrentLoc);
+    //       $scope.myCurrentLoc = myCurrentLoc;
+    //     })
+    //     .then(function(){return uiGmapGoogleMapApi;})
+
+    //     .then(function(maps){
+    //       console.log('maps', maps);
+    //       $scope.googlemap = {};
+    //       $scope.map = {
+    //           center: {        // set center on Portland 
+    //               latitude: 45.521, 
+    //               longitude: -122.673 
+    //           },
+    //           zoom: 13,
+    //           pan: 1,
+    //           options: myLocation.getMapOptions().mapOptions,
+    //           control: {},
+    //           events: {
+    //               tilesloaded: function (maps, eventName, args) {
+    //                       console.log('The ' + eventName + ' function fires every time you move or zoom the map');
+    //                   console.log('initialMapLoad', initialMapLoad);
+    //                   if(initialMapLoad === 0){
+                         
+    //                      alert(maps.getBounds());
+    //                      initialMapLoad = 1;
+    //                   }
+    //               },
+    //               dragend: function (maps, eventName, args) {
+    //                       console.log('The ' + eventName + ' function fires every time you drag the map');
+    //               },
+    //               zoom_changed: function (maps, eventName, args) {
+    //                       console.log('The ' + eventName + ' function fires every time you zoom');
+    //               }
+    //           }
+    //       };
+    //       $scope.map.center = $scope.myCurrentLoc;
+    //       console.log('mapsdlajhfladhjfa', maps.LatLngBounds);
+
+    //     })
+
+    //   ;
+    // }])
+
+
+// ----------------------------------------------------------------------------------------------
+
+    .controller('MapCtrl', ['$scope', '$http','$window', 'baseURL', 'myLocation', 
       'rackFactory', 'markerFactory', 'locationFactory', 'uiGmapIsReady', 'uiGmapGoogleMapApi', 
-      function($scope, $http, $window, baseURL, rackFactory, markerFactory, locationFactory, uiGmapIsReady, uiGmapGoogleMapApi) {
+      function($scope, $http, $window, baseURL, myLocation, rackFactory, markerFactory, locationFactory, uiGmapIsReady, uiGmapGoogleMapApi) {
 
         // leaving these out has marker only appear on zoom user location 
         // $scope.lat = 45.521570;
@@ -28,66 +83,128 @@ angular.module('angularTheftAppApp')
             center: {
               latitude: 45.521, 
               longitude: -122.673
-            }, 
-            zoom: 10,
-            control: {},
-            events: {}
+            }}; 
 
-          };
+          //   zoom: 10,
+          //   control: {},
+          //   events: {}
+
+          // };
 
         $scope.rackMarkers = [];
         $scope.distance = 50;
 
 // ----------------------------------------------------------------------------------------------
-        uiGmapGoogleMapApi.then(function(maps) {
-          console.log('kajdhkajhdg;khjad;g');
-          $scope.map = {
-            center: {
-              latitude: 45.521, 
-              longitude: -122.673
-            }, 
-            zoom: 10,
-            control: {}, 
-            events: {
-              tilesloaded: function(maps) {
-                console.log(maps);
-              },
-              dragend: function(maps) {
-                console.log('askdjf;asdjsalkfj');
-              }
-            }
-          };  
+        // uiGmapGoogleMapApi.then(function(maps) {
+        //   console.log('kajdhkajhdg;khjad;g');
+          // $scope.map = {
+          //   center: {
+          //     latitude: 45.521, 
+          //     longitude: -122.673
+          //   }};
+        //     zoom: 10,
+        //     control: {}, 
+        //     events: {
+        //       tilesloaded: function(maps) {
+        //         console.log(maps);
+        //       },
+        //       dragend: function(maps) {
+        //         console.log('askdjf;asdjsalkfj');
+        //       }
+        //     }
+        //   };  
 
 
 
-        });
+        // });
 
 // ----------------------------------------------------------------------------------------------
 // initialze scope lat and long to values
 // need to change this to use user lat/long if possible 
 
         // first pass at grabbing user location 
-        $window.navigator.geolocation.getCurrentPosition(function(position){
-          console.log(position);
-          var lati = position.coords.latitude;
-          var longi = position.coords.longitude;
+        // $window.navigator.geolocation.getCurrentPosition(function(position){
+        //   console.log(position);
+        //   var lati = position.coords.latitude;
+        //   var longi = position.coords.longitude;
 
-          // if user location inside usable area re-center map 
-          if (locationFactory.locCheck(lati, longi)) {
-            // watches the variables inside func and updates app if they change 
-            $scope.$apply(function(){
-              $scope.lat = lati;
-              $scope.lon = longi; 
-              $scope.map = {control: {}, center: {latitude: $scope.lat, longitude: $scope.lon}, zoom: 15};
-              $scope.marker.coords = {latitude: $scope.lat, longitude: $scope.lon};
-            });
+        //   // if user location inside usable area re-center map 
+        //   if (locationFactory.locCheck(lati, longi)) {
+        //     // watches the variables inside func and updates app if they change 
+        //     $scope.$apply(function(){
+        //       $scope.lat = lati;
+        //       $scope.lon = longi; 
+        //       $scope.map = {control: {}, center: {latitude: $scope.lat, longitude: $scope.lon}, zoom: 15};
+        //       $scope.marker.coords = {latitude: $scope.lat, longitude: $scope.lon};
+        //     });
 
-          } else {
-            console.log('outside of usable area');
-          }
+        //   } else {
+        //     console.log('outside of usable area');
+        //   }
+
+        // });
+      $scope.myCurrentLocation = {};
+    
+      var initialMapLoad = 0;
+
+      myLocation.getCurrentLoc()
+        .then(function(myCurrentLoc){
+          console.log('myCurrentLoc', myCurrentLoc);
+          $scope.myCurrentLoc = myCurrentLoc;
+        })
+        .then(function(){return uiGmapGoogleMapApi;})
+
+        .then(function(maps){
+          console.log('maps', maps);
+          $scope.googlemap = {};
+          $scope.map = {
+              center: {        // set center on Portland 
+                  latitude: 45.521, 
+                  longitude: -122.673 
+              },
+              zoom: 13,
+              pan: 1,
+              options: myLocation.getMapOptions().mapOptions,
+              events: {
+                  tilesloaded: function (maps, eventName, args) {
+                      console.log('The ' + eventName + ' function fires every time you move or zoom the map');
+                      console.log('initialMapLoad', initialMapLoad);
+                      if(initialMapLoad === 0){
+                         
+                         // alert(maps.getBounds());
+                         initialMapLoad = 1;
+                      }
+                  },
+                  dragend: function (maps, eventName, args) {
+                          console.log('The ' + eventName + ' function fires every time you drag the map');
+                  },
+                  zoom_changed: function (maps, eventName, args) {
+                          var test = maps.getCenter();
+                          console.log(test);
+                          console.log('The ' + eventName + ' function fires every time you zoom');
+                  }
+              }
+          };
+          $scope.map.center = $scope.myCurrentLoc;
+          console.log('mapsdlajhfladhjfa', maps.LatLngBounds);
+          console.log($scope.map.zoom);
+          console.log($scope.map.events);
+
+          uiGmapIsReady.promise()
+          .then(function(instances) {
+            var testMap = instances[0].map; 
+            console.log("test map");
+            console.log(testMap);
+
+        var test = testMap.getBounds();
+        console.log(test);
 
         });
-   
+
+        })
+
+      ;
+      
 // ----------------------------------------------------------------------------------------------
 // calculate the radius of the map that is currently visable to search with this dist 
       // $scope.map = {
@@ -103,14 +220,16 @@ angular.module('angularTheftAppApp')
       //     }
       //   }
       // };
-      uiGmapIsReady.promise()
-      .then(function(instances) {
-        var testMap = instances[0].map; 
-        console.log("test map");
-        console.log(testMap);
-      // var test = $scope.map.control.getGMap()
-      // console.log(test);
-      });
+      // uiGmapIsReady.promise()
+      // .then(function(instances) {
+      //   var testMap = instances[0].map; 
+      //   console.log("test map");
+      //   console.log(testMap);
+      //   // var test = $scope.googlemap.getBounds();
+      //   // console.log(test);
+      // // var test = $scope.map.control.getGMap()
+      // // console.log(test);
+      // });
 
 
 
