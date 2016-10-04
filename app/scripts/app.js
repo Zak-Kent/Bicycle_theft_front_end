@@ -18,7 +18,7 @@ angular
     'ngTouch', 
     'uiGmapgoogle-maps'
   ])
-  .config(function ($routeProvider) {
+  .config(function ($routeProvider, uiGmapGoogleMapApiProvider) {
     $routeProvider
       .when('/', {
         templateUrl: 'views/main.html',
@@ -33,6 +33,12 @@ angular
       .otherwise({
         redirectTo: '/'
       });
+
+    uiGmapGoogleMapApiProvider.configure({
+      key: 'AIzaSyAp0T-QkAiOsPQArJvVFnSEum42qvaEy_s',
+      v: '3.20', //defaults to latest 3.X anyhow
+      libraries: 'geometry'
+    });      
 
   });
   // .config(function(uiGmapGoogleMapApiProvider) {
