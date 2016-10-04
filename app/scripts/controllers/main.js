@@ -16,7 +16,6 @@
 angular.module('angularTheftAppApp')
     .constant('baseURL','http://localhost:8000/api/v1/racks/')
 
-
 // You don't need functions monitoring the map for changes!!!
 // just grab the center and bounds and calculate the dist once the search button is pressed 
 
@@ -28,6 +27,7 @@ angular.module('angularTheftAppApp')
       function($scope, $http, $window, baseURL, myLocation, rackFactory, markerFactory, 
         locationFactory, uiGmapIsReady, uiGmapGoogleMapApi) {
 
+        // needs these values to start up map on load. they get changed get location call below 
         $scope.map = {
           center: {
             latitude: 45.521, 
@@ -38,14 +38,11 @@ angular.module('angularTheftAppApp')
         $scope.rackMarkers = [];
         $scope.distance = 50;
         $scope.myCurrentLocation = {};
-      
-        var initialMapLoad = 0;
 
-          myLocation.getCurrentLoc()
-          .then(function(myCurrentLoc){
-            console.log('myCurrentLoc', myCurrentLoc);
-            $scope.myCurrentLoc = myCurrentLoc;
-
+        myLocation.getCurrentLoc()
+        .then(function(myCurrentLoc){
+          console.log('myCurrentLoc', myCurrentLoc);
+          $scope.myCurrentLoc = myCurrentLoc;
 // ----------------------------------------------------------------------------------------------
           var lati = myCurrentLoc.latitude;
           var longi = myCurrentLoc.longitude;
@@ -56,30 +53,24 @@ angular.module('angularTheftAppApp')
           } else {
             console.log('outside of usable area');
           }
-
+        })
 // ----------------------------------------------------------------------------------------------
+        .then(function(){return uiGmapGoogleMapApi;})
 
-          })
-          .then(function(){return uiGmapGoogleMapApi;})
-
-          .then(function(maps){
-            console.log('maps', maps);
-            $scope.googlemap = {};
-            $scope.map = {
-                center: {        // set center on Portland 
-                    latitude: 45.521, 
-                    longitude: -122.673 
-                },
-                zoom: 13,
-                pan: 1
-                // options: myLocation.getMapOptions().mapOptions
-            };
-            $scope.map.center = $scope.myCurrentLoc;
-            console.log('mapsdlajhfladhjfa', maps.LatLngBounds);
-            console.log($scope.map.zoom);
-            console.log($scope.map.events);
-
-          });
+        .then(function(maps){
+          console.log('maps', maps);
+          $scope.googlemap = {};
+          $scope.map = {
+              center: {        // set center on Portland 
+                  latitude: 45.521, 
+                  longitude: -122.673 
+              },
+              zoom: 13,
+              pan: 1
+              // options: myLocation.getMapOptions().mapOptions
+          };
+          $scope.map.center = $scope.myCurrentLoc;
+        });
 
 // ----------------------------------------------------------------------------------------------
         // using markerService to create search marker 
@@ -113,6 +104,34 @@ angular.module('angularTheftAppApp')
           
 // ----------------------------------------------------------------------------------------------
         $scope.rackSearch = function() {
+          // this is where you need to grab bounds and center and find the seach dist maybe just left bound & right
+          uiGmapIsReady.promise()
+            .then(function(instances) {
+              var mapObj = instances[0].map; 
+              var bounds = mapObj.getBounds();
+
+              // to get lat/long need to call center.lat()/.long()
+              var centerLat = mapObj.getCenter().lat();
+              
+              console.log(bounds.b.b);
+              console.log(bounds.b.f);
+              console.log(centerLat);
+
+              // make new lat/lng obj for right/left edge of map for dist search 
+              var leftSide = new google.maps.LatLng(centerLat, bounds.b.b);
+              var rightSide = new google.maps.LatLng(centerLat, bounds.b.f);
+
+              console.log('leftSide', leftSide.lng());
+
+              console.log('distance between left & right of map')
+              console.log(google.maps.geometry.spherical.computeDistanceBetween(leftSide, rightSide));
+
+
+          });
+
+
+
+
           var url = baseURL+'?dist='+$scope.distance+'&point='+$scope.lon+','+$scope.lat;
 
           // clear out existing markers 
@@ -126,18 +145,7 @@ angular.module('angularTheftAppApp')
             $scope.rackMarkers = rackFactory.sortRacks($scope.markers, $scope.marker);
           });
 
-          // this is where you need to grab bounds and center and find the seach dist maybe just left bound & right
-          // uiGmapIsReady.promise()
-          //   .then(function(instances) {
-          //     var testMap = instances[0].map; 
-          //     console.log("test map");
-          //     console.log(testMap);
-          //     console.log(testMap.events);
 
-          //     var test = testMap.getBounds();
-          //     console.log(test);
-
-          // });
         };
 
 // function to control search distance and 2 way data binding 

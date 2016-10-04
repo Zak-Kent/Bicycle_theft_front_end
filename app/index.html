@@ -71,7 +71,7 @@
     </script>
 
     <!-- !!!!! this isn't the recomended way to include see Gmaps tutotrial SDK -->
-    <script src='//maps.googleapis.com/maps/api/js?'></script>
+    <!-- <script src='//maps.googleapis.com/maps/api/js?'></script> -->
 
     <!-- build:js(.) scripts/vendor.js -->
     <!-- bower:js -->
@@ -87,12 +87,19 @@
     <script src="bower_components/angular-simple-logger/dist/angular-simple-logger.js"></script>
     <script src="bower_components/lodash/lodash.js"></script>
     <script src="bower_components/markerclustererplus/src/markerclusterer.js"></script>
+
+    <!--Had to comment out these scripts due to the change in how google maps is being loaded through 
+        app.js -->
+    <!--
     <script src="bower_components/google-maps-utility-library-v3-markerwithlabel/dist/markerwithlabel.js"></script>
     <script src="bower_components/google-maps-utility-library-v3-infobox/dist/infobox.js"></script>
     <script src="bower_components/google-maps-utility-library-v3-keydragzoom/dist/keydragzoom.js"></script>
     <script src="bower_components/js-rich-marker/src/richmarker.js"></script>
-    <script src="bower_components/angular-google-maps/dist/angular-google-maps.js"></script>
     <script src="bower_components/map-icons/dist/js/map-icons.js"></script>
+    -->
+    
+    <script src="bower_components/angular-google-maps/dist/angular-google-maps.js"></script>
+    
     <!-- endbower -->
     <!-- endbuild -->
 

@@ -35,18 +35,10 @@ angular
       });
 
     uiGmapGoogleMapApiProvider.configure({
-      key: 'AIzaSyAp0T-QkAiOsPQArJvVFnSEum42qvaEy_s',
-      v: '3.20', //defaults to latest 3.X anyhow
-      libraries: 'geometry'
+      key: 'AIzaSyD5CTIQmu3p3nscIVcDJxxJOlk5n5LR3kY',
+      // v: '', //defaults to latest 3.X anyhow
+      libraries: 'weather,geometry,visualization'
     });      
 
   });
-  // .config(function(uiGmapGoogleMapApiProvider) {
-  //   uiGmapGoogleMapApiProvider.configure({
-  //       key: 'AIzaSyAp0T-QkAiOsPQArJvVFnSEum42qvaEy_s',
-  //       v: '3.20', //defaults to latest 3.X anyhow
-  //       libraries: 'geometry'
-  //   });
-
-  // });
 
