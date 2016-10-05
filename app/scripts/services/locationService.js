@@ -28,6 +28,7 @@ angular.module('angularTheftAppApp')
 
 // service that uses $q to return a promise to get user location 
 .service('myLocation', ['$window', '$q', function($window, $q) {
+
     this.getMapOptions = function(){
       return {
         mapOptions : {
@@ -59,8 +60,6 @@ angular.module('angularTheftAppApp')
       };
     };
 
-
-
   this.getCurrentLoc = function() {
     var deferred = $q.defer();
     $window.navigator.geolocation.getCurrentPosition(function(position) {
@@ -74,4 +73,53 @@ angular.module('angularTheftAppApp')
     return deferred.promise; 
   };
 
+  this.getMapDist = function(mapObj) {
+    var deferred = $q.defer();
+
+    var centerLat = mapObj.getCenter().lat();
+    var boundsCoords = mapObj.getBounds();
+
+    var leftSide = new google.maps.LatLng(centerLat, boundsCoords.b.b);
+    var rightSide = new google.maps.LatLng(centerLat, boundsCoords.b.f);
+
+    var distance = google.maps.geometry.spherical.computeDistanceBetween(leftSide, rightSide);
+
+    var output = {
+      center: {
+        lat: centerLat,
+        lng: mapObj.getCenter().lng()
+      },
+      distanceM: distance 
+    };
+
+    deferred.resolve(output);
+
+    return deferred.promise;
+  };
+
 }]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

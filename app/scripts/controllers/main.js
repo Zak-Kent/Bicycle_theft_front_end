@@ -102,51 +102,38 @@ angular.module('angularTheftAppApp')
         };
           
 // ----------------------------------------------------------------------------------------------
+        // needed to wrap this into nested promises to make sure distances and location were returned 
+        // before get call. Otherwise you get undefined values in query string and map adjustment is one step behind. 
         $scope.rackSearch = function() {
-          // this is where you need to grab bounds and center and find the seach dist maybe just left bound & right
+          // check if map OBJ is ready when ready grab instance 
           uiGmapIsReady.promise()
             .then(function(instances) {
               var mapObj = instances[0].map; 
-              var bounds = mapObj.getBounds();
+              console.log(mapObj);
 
-              // to get lat/long need to call center.lat()/.long()
-              $scope.centerLat = mapObj.getCenter().lat();
-              $scope.centerLon = mapObj.getCenter().lng();
-              
-              console.log(bounds.b.b);
-              console.log(bounds.b.f);
-              
+              // pass map instance to service and get distance between L & R sides and center lat/lng 
+              myLocation.getMapDist(mapObj)
+                .then(function(distOut){
+                  console.log('distOut', distOut);
 
-              // make new lat/lng obj for right/left edge of map for dist search 
-              var leftSide = new google.maps.LatLng($scope.centerLat, bounds.b.b);
-              var rightSide = new google.maps.LatLng($scope.centerLat, bounds.b.f);
+                  // ********* include distance logic here in another service ****************** // 
+                  var url = baseURL+'?dist='+distOut.distanceM+'&point='+distOut.center.lng+','+distOut.center.lat;
 
-              $scope.mapDistance = google.maps.geometry.spherical.computeDistanceBetween(leftSide, rightSide);
+                  console.log('url', url);
 
-              console.log('leftSide', leftSide.lng());
+                  // clear out existing markers 
+                  $scope.rackMarkers = [];
 
-              console.log('distance between left & right of map')
-              console.log($scope.mapDistance);
-              console.log($scope.centerLat);
-              console.log($scope.centerLon);
+                  // create new object to hold markers in httpHelp function 
+                  $scope.markers = [];
 
-          });
+                  httpHelp(url, $scope.markers, function(){
+                    // callback rackFactory sortRacks method to assign markers to racks based on theft score 
+                    $scope.rackMarkers = rackFactory.sortRacks($scope.markers, $scope.marker);
+                  });
+                });
 
-          var url = baseURL+'?dist='+$scope.mapDistance+'&point='+$scope.centerLon+','+$scope.centerLat;
-
-          console.log('url', url);
-
-          // clear out existing markers 
-          $scope.rackMarkers = [];
-
-          // create new object to hold markers in httpHelp function 
-          $scope.markers = [];
-
-          httpHelp(url, $scope.markers, function(){
-            // callback rackFactory sortRacks method to assign markers to racks based on theft score 
-            $scope.rackMarkers = rackFactory.sortRacks($scope.markers, $scope.marker);
-          });
-
+            });
         };
 // ----------------------------------------------------------------------------------------------
 
