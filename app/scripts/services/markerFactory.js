@@ -1,10 +1,10 @@
 'use strict';
 
 angular.module('angularTheftAppApp')
-.factory('rackFactory', [ function(){
-    var rackFactory = {};
+.factory('markerFactory', [ function(){
+    var markerFactory = {};
 
-    rackFactory.sortRacks = function (racks, marker) {
+    markerFactory.sortRacks = function (racks, marker) {
     // takes a list of sorted racks and assigns red, yellow, green markers to them based on theft score  
         racks.sort(function(a, b) {
           return parseFloat(a.theft_prob_per_bike_day_x_1000) - parseFloat(b.theft_prob_per_bike_day_x_1000);
@@ -53,6 +53,27 @@ angular.module('angularTheftAppApp')
         return sortedRacks;
     };
 
-    return rackFactory;
+    markerFactory.createMarker = function(lati, longi, aFunc){
+        var marker = {
+            id: 0,
+            coords: {
+                latitude: lati,
+                longitude: longi
+            },
+            options: { 
+                draggable: true, 
+                icon: '../../bower_components/map-icons/src/icons/bicycle-store.svg'
+            },
+            events: {
+                dragend: function (marker) {
+                    var lat = marker.getPosition().lat();
+                    var lon = marker.getPosition().lng();
+                    aFunc(lat, lon);
+                }
+            }
+        };
+        return marker;
+    }; 
+    return markerFactory;
 }]);
 

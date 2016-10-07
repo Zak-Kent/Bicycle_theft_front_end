@@ -22,8 +22,8 @@ angular.module('angularTheftAppApp')
 // ----------------------------------------------------------------------------------------------
 
     .controller('MapCtrl', ['$scope', '$http', 'baseURL', 'mapServices', 
-      'rackFactory', 'markerFactory', 'uiGmapIsReady', 'uiGmapGoogleMapApi', 
-      function($scope, $http, baseURL, mapServices, rackFactory, markerFactory, uiGmapIsReady, uiGmapGoogleMapApi) {
+      'markerFactory', 'uiGmapIsReady', 'uiGmapGoogleMapApi', 
+      function($scope, $http, baseURL, mapServices, markerFactory, uiGmapIsReady, uiGmapGoogleMapApi) {
 
         // needs these values to start up map on load. they get changed get location call below 
         $scope.map = {
@@ -126,8 +126,8 @@ angular.module('angularTheftAppApp')
                   $scope.markers = [];
 
                   httpHelp(url, $scope.markers, function(){
-                    // callback rackFactory sortRacks method to assign markers to racks based on theft score 
-                    $scope.rackMarkers = rackFactory.sortRacks($scope.markers, $scope.marker);
+                    // callback markerFactory sortRacks method to assign markers to racks based on theft score 
+                    $scope.rackMarkers = markerFactory.sortRacks($scope.markers, $scope.marker);
                   });
                 });
 
