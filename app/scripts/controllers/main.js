@@ -21,9 +21,9 @@ angular.module('angularTheftAppApp')
 
 // ----------------------------------------------------------------------------------------------
 
-    .controller('MapCtrl', ['$scope', '$http', 'baseURL', 'mapServices', 
+    .controller('MapCtrl', ['$scope', 'baseURL', 'mapServices', 'httpService',
       'markerFactory', 'uiGmapIsReady', 'uiGmapGoogleMapApi', 
-      function($scope, $http, baseURL, mapServices, markerFactory, uiGmapIsReady, uiGmapGoogleMapApi) {
+      function($scope, baseURL, mapServices, httpService, markerFactory, uiGmapIsReady, uiGmapGoogleMapApi) {
 
         // needs these values to start up map on load. they get changed get location call below 
         $scope.map = {
@@ -82,21 +82,6 @@ angular.module('angularTheftAppApp')
         };
 
         $scope.marker = markerFactory.createMarker($scope.lat, $scope.lon, dragEvent);
-
-// ----------------------------------------------------------------------------------------------
-        var httpHelp = function(url, racksObj, callback){
-          // adds racks obj to array and then checks to see if there is more paginated data
-          // if so recursively call the api until all data returned 
-          $http.get(url).then(function(response){ 
-            Array.prototype.push.apply(racksObj, response.data.results);
-          
-            if (response.data.next !== null) {
-              httpHelp(response.data.next, racksObj, callback);
-            } else {
-              callback();
-            }
-          });
-        };
           
 // ----------------------------------------------------------------------------------------------
         // needed to wrap this into nested promises to make sure distances and location were returned 
@@ -122,13 +107,11 @@ angular.module('angularTheftAppApp')
                   // clear out existing markers 
                   $scope.rackMarkers = [];
 
-                  // create new object to hold markers in httpHelp function 
-                  $scope.markers = [];
-
-                  httpHelp(url, $scope.markers, function(){
-                    // callback markerFactory sortRacks method to assign markers to racks based on theft score 
-                    $scope.rackMarkers = markerFactory.sortRacks($scope.markers, $scope.marker);
+                  httpService.httpHelp(url).then(function(results) {
+                    console.log(results);
+                    $scope.rackMarkers = markerFactory.sortRacks(results, $scope.marker);
                   });
+
                 });
 
             });
