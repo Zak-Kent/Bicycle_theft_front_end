@@ -66,22 +66,22 @@ var marker = {
 
 
 describe('LocationFactory checks', function() {
-    var rackFactory;
+    var markerFactory;
 
     beforeEach(angular.mock.module('angularTheftAppApp'));
 
-    beforeEach(inject(function(_rackFactory_){
-      rackFactory = _rackFactory_;
+    beforeEach(inject(function(_markerFactory_){
+      markerFactory = _markerFactory_;
     }));
 
     it('should exist', function(){
-        expect(rackFactory).toBeDefined();
+        expect(markerFactory).toBeDefined();
     });
     it('sortRacks method exists', function() {
-        expect(rackFactory.sortRacks).toBeDefined();
+        expect(markerFactory.sortRacks).toBeDefined();
     });
     it('sortRack method works as expeted', function(){
-        var sortedRacks = rackFactory.sortRacks(racks, marker); 
+        var sortedRacks = markerFactory.sortRacks(racks, marker); 
 
         // needed to assign variables to objects in array otherwise can't get properties
         var rack0 = sortedRacks[0];
@@ -92,6 +92,16 @@ describe('LocationFactory checks', function() {
         expect(rack0.theftProb < rack3.theftProb).toEqual(true);
         expect(rack0.theftProb < rack2.theftProb).toEqual(true);
         expect(rack0.theftProb < rack1.theftProb).toEqual(true);
+    });
+
+    it('markerFactory creates object', function(){
+      expect(markerFactory.createMarker(45, 50, function(){})).toBeDefined();
+    });
+
+    it('markerFactory object has correct properties', function(){
+      var marker = markerFactory.createMarker(45, 50, function(){});
+      expect(marker.coords.latitude).toEqual(45);
+      expect(marker.coords.longitude).toEqual(50);
     });
 
 });
