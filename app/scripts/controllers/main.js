@@ -21,10 +21,9 @@ angular.module('angularTheftAppApp')
 
 // ----------------------------------------------------------------------------------------------
 
-    .controller('MapCtrl', ['$scope', '$http','$window', 'baseURL', 'myLocation', 
-      'rackFactory', 'markerFactory', 'locationFactory', 'uiGmapIsReady', 'uiGmapGoogleMapApi', 
-      function($scope, $http, $window, baseURL, myLocation, rackFactory, markerFactory, 
-        locationFactory, uiGmapIsReady, uiGmapGoogleMapApi) {
+    .controller('MapCtrl', ['$scope', '$http', 'baseURL', 'mapServices', 
+      'rackFactory', 'markerFactory', 'uiGmapIsReady', 'uiGmapGoogleMapApi', 
+      function($scope, $http, baseURL, mapServices, rackFactory, markerFactory, uiGmapIsReady, uiGmapGoogleMapApi) {
 
         // needs these values to start up map on load. they get changed get location call below 
         $scope.map = {
@@ -33,12 +32,10 @@ angular.module('angularTheftAppApp')
             longitude: -122.673
           }
         }; 
-
         $scope.rackMarkers = [];
-        $scope.distance = 50;
-        $scope.myCurrentLocation = {};
+// ----------------------------------------------------------------------------------------------
 
-        myLocation.getCurrentLoc()
+        mapServices.getCurrentLoc()
         .then(function(myCurrentLoc){
           console.log('myCurrentLoc', myCurrentLoc);
           $scope.myCurrentLoc = myCurrentLoc;
@@ -46,7 +43,7 @@ angular.module('angularTheftAppApp')
           var lati = myCurrentLoc.latitude;
           var longi = myCurrentLoc.longitude;
             // if user location inside usable area re-center map 
-          if (locationFactory.locCheck(lati,longi)) {
+          if (mapServices.locationCheck(lati,longi)) {
             // watches the variables inside func and updates app if they change 
               $scope.marker.coords = {latitude: lati, longitude: longi};
           } else {
@@ -65,8 +62,8 @@ angular.module('angularTheftAppApp')
                   longitude: -122.673 
               },
               zoom: 13,
-              pan: 1
-              // options: myLocation.getMapOptions().mapOptions
+              pan: 1,
+              options: mapServices.getMapOptions().mapOptions
           };
           $scope.map.center = $scope.myCurrentLoc;
         });
@@ -112,12 +109,13 @@ angular.module('angularTheftAppApp')
               console.log(mapObj);
 
               // pass map instance to service and get distance between L & R sides and center lat/lng 
-              myLocation.getMapDist(mapObj)
+              mapServices.getMapDist(mapObj)
                 .then(function(distOut){
                   console.log('distOut', distOut);
 
+                  var searchDist = distOut.distanceM * 0.5;
                   // ********* include distance logic here in another service ****************** // 
-                  var url = baseURL+'?dist='+distOut.distanceM+'&point='+distOut.center.lng+','+distOut.center.lat;
+                  var url = baseURL+'?dist='+searchDist+'&point='+distOut.center.lng+','+distOut.center.lat;
 
                   console.log('url', url);
 

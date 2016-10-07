@@ -1,64 +1,59 @@
 'use strict';
 
 angular.module('angularTheftAppApp')
-.factory('locationFactory', [ function(){
-  var locationFactory = {};
 
-  // min/max values found using valid data points from DB 
-  var xMin = 122.472241;
-  var xMax = 122.835418;
-  var yMin = 45.431566;
-  var yMax = 45.637628;
+// service that uses $q to return a promise to get user location 
+.service('mapServices', ['$window', '$q', function($window, $q) {
 
-  locationFactory.locCheck = function(lat, lon){
+  this.getMapOptions = function() {
+    return {
+      mapOptions : {
+        minZoom : 3,
+        zoomControl : true,
+        draggable : true,
+        navigationControl : false,
+        mapTypeControl : false,
+        scaleControl : false,
+        streetViewControl : false,
+        //mapTypeId : google.maps.MapTypeId.HYBRID,
+        disableDoubleClickZoom : false,
+        keyboardShortcuts : true,
+        styles : [{
+            featureType : "poi",
+            elementType : "labels",
+            stylers : [{
+                visibility : "off"
+            }]
+        }, 
+        {
+          featureType : "transit",
+          elementType : "all",
+          stylers : [{
+              visibility : "off"
+          }]
+        }],
+      }
+    };
+  };
 
-    var posLon = lon * -1; 
+  this.locationCheck = function(lat, lng) {
+    // min/max values found using valid data points from DB 
+    var xMin = 122.472241;
+    var xMax = 122.835418;
+    var yMin = 45.431566;
+    var yMax = 45.637628;
+
+    var posLon = lng * -1;
+
     // check to see if point is inside user area 
     if (xMax >= posLon && posLon >= xMin && yMax >= lat && lat >= yMin){
       console.log('inisde the square');
       return true; 
     } else {
       console.log('outside the square');
-      return false; 
-      
+      return false;    
     }
   };
-  return locationFactory;
-}])
-
-// service that uses $q to return a promise to get user location 
-.service('myLocation', ['$window', '$q', function($window, $q) {
-
-    this.getMapOptions = function(){
-      return {
-        mapOptions : {
-          minZoom : 3,
-          zoomControl : false,
-          draggable : true,
-          navigationControl : false,
-          mapTypeControl : false,
-          scaleControl : false,
-          streetViewControl : false,
-          //mapTypeId : google.maps.MapTypeId.HYBRID,
-          disableDoubleClickZoom : false,
-          keyboardShortcuts : true,
-          styles : [{
-              featureType : "poi",
-              elementType : "labels",
-              stylers : [{
-                  visibility : "off"
-              }]
-          }, 
-          {
-            featureType : "transit",
-            elementType : "all",
-            stylers : [{
-                visibility : "off"
-            }]
-          }],
-        }
-      };
-    };
 
   this.getCurrentLoc = function() {
     var deferred = $q.defer();
@@ -78,7 +73,6 @@ angular.module('angularTheftAppApp')
 
     var centerLat = mapObj.getCenter().lat();
     var boundsCoords = mapObj.getBounds();
-
     var leftSide = new google.maps.LatLng(centerLat, boundsCoords.b.b);
     var rightSide = new google.maps.LatLng(centerLat, boundsCoords.b.f);
 
