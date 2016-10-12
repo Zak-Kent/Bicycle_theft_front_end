@@ -42,13 +42,13 @@ angular.module('angularTheftAppApp')
             sortedRacks.push(obj);
         }
         // add invisible marker to the list of racks where search location is so zoom fit includes search location
-        // var markersetup = {
-        //           id: 0,
-        //           latitude: marker.coords.latitude,
-        //           longitude: marker.coords.longitude,
-        //           markerOptions: {visible: false}
-        //           };
-        // sortedRacks.push(markersetup);
+        var markersetup = {
+                  id: 0,
+                  latitude: marker.coords.latitude,
+                  longitude: marker.coords.longitude,
+                  markerOptions: {visible: false}
+                  };
+        sortedRacks.push(markersetup);
 
         return sortedRacks;
     };

@@ -14,7 +14,7 @@
 // have map return first 10 racs in above case with map fit to marker and racks 
 
 angular.module('angularTheftAppApp')
-    .constant('baseURL','http://localhost:8000/api/v1/racks/')
+    .constant('baseURL','http://localhost:8000/api/v1/racks/sorted')
 
 // You don't need functions monitoring the map for changes!!!
 // just grab the center and bounds and calculate the dist once the search button is pressed 
@@ -34,12 +34,12 @@ angular.module('angularTheftAppApp')
         }; 
         $scope.rackMarkers = [];
 // ----------------------------------------------------------------------------------------------
+// map setup 
 
         mapServices.getCurrentLoc()
         .then(function(myCurrentLoc){
           console.log('myCurrentLoc', myCurrentLoc);
           $scope.myCurrentLoc = myCurrentLoc;
-// ----------------------------------------------------------------------------------------------
           var lati = myCurrentLoc.latitude;
           var longi = myCurrentLoc.longitude;
             // if user location inside usable area re-center map 
@@ -50,35 +50,32 @@ angular.module('angularTheftAppApp')
             console.log('outside of usable area');
           }
         })
-// ----------------------------------------------------------------------------------------------
         .then(function(){return uiGmapGoogleMapApi;})
-
         .then(function(maps){
           console.log('maps', maps);
           $scope.googlemap = {};
           $scope.map = {
-              center: {        // set center on Portland 
-                  latitude: 45.521, 
-                  longitude: -122.673 
-              },
+              center: $scope.myCurrentLoc,
               zoom: 13,
               pan: 1,
               options: mapServices.getMapOptions().mapOptions
           };
-          $scope.map.center = $scope.myCurrentLoc;
         });
 
 // ----------------------------------------------------------------------------------------------
         // using markerService to create search marker 
 
         // helper function used to manipulate scope outside of markerFactory 
-        var dragEvent = function(lat, lon){
+        var dragEvent = function(lat, lng){
           console.log('inside drag event');
-          console.log(lat, lon);
+          console.log(lat, lng);
           $scope.lat = lat;
-          $scope.lon = lon;
+          $scope.lon = lng;
 
-          console.log($scope.lat, $scope.lon);
+          $scope.marker.coords.latitude = lat;
+          $scope.marker.coords.longitude = lng;
+
+          // console.log($scope.lat, $scope.lng);
         };
 
         $scope.marker = markerFactory.createMarker($scope.lat, $scope.lon, dragEvent);
@@ -87,34 +84,18 @@ angular.module('angularTheftAppApp')
         // needed to wrap this into nested promises to make sure distances and location were returned 
         // before get call. Otherwise you get undefined values in query string and map adjustment is one step behind. 
         $scope.rackSearch = function() {
-          // check if map OBJ is ready when ready grab instance 
-          uiGmapIsReady.promise()
-            .then(function(instances) {
-              var mapObj = instances[0].map; 
-              console.log(mapObj);
 
-              // pass map instance to service and get distance between L & R sides and center lat/lng 
-              mapServices.getMapDist(mapObj)
-                .then(function(distOut){
-                  console.log('distOut', distOut);
+          var lat = $scope.marker.coords.latitude;
+          var lng = $scope.marker.coords.longitude;
 
-                  var searchDist = distOut.distanceM * 0.5;
-                  // ********* include distance logic here in another service ****************** // 
-                  var url = baseURL+'?dist='+searchDist+'&point='+distOut.center.lng+','+distOut.center.lat;
+          var url = baseURL+'?racks='+30+'&point='+lng+','+lat;
 
-                  console.log('url', url);
+          httpService.httpHelp(url).then(function(results) {
 
-                  // clear out existing markers 
-                  $scope.rackMarkers = [];
+            $scope.rackMarkers = markerFactory.sortRacks(results, $scope.marker);
 
-                  httpService.httpHelp(url).then(function(results) {
-                    console.log(results);
-                    $scope.rackMarkers = markerFactory.sortRacks(results, $scope.marker);
-                  });
+          });
 
-                });
-
-            });
         };
 // ----------------------------------------------------------------------------------------------
 
